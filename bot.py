@@ -23,9 +23,9 @@ NAME, FLOOR, PHOTO, RATING, NOTES = range(5)
 
 # Shift windows (local time, 24h)
 MORNING_START = 12   # Reminders start at 12pm
-MORNING_END   = 18   # Stop reminding for morning after 6pm
+MORNING_END   = 18   # 6pm — end of morning shift
 NIGHT_START   = 22   # Reminders start at 10pm
-NIGHT_END_H   = 1    # Stop night reminders after 1am
+NIGHT_END_H   = 1    # 1am
 
 LOCAL_TZ = timezone(timedelta(hours=LOCAL_UTC_OFFSET))
 
@@ -37,11 +37,10 @@ def local_now() -> datetime:
 def current_shift() -> str | None:
     """Return 'morning' or 'night' based on local time, or None if between shifts."""
     hour = local_now().hour
-    if MORNING_START <= hour < MORNING_END:
+    if 6 <= hour < 18:
         return "morning"
-    if hour >= NIGHT_START or hour < NIGHT_END_H:
+    if hour >= 18:
         return "night"
-    return None
 
 
 def has_submitted_shift(user_info: dict, shift: str) -> bool:
@@ -274,7 +273,7 @@ def main():
     # The window guard inside remind_morning stops it after 6pm
     jq.run_repeating(
         remind_morning,
-        interval=1800,  # 30 minutes
+        interval=3600,  # 1 hour
         first=local_to_utc_time(MORNING_START, 0),
     )
 
