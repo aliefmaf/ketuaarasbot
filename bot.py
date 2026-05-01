@@ -281,7 +281,7 @@ def main():
     # The window guard inside remind_night stops it after 1am
     jq.run_repeating(
         remind_night,
-        interval=1800,
+        interval=3600,
         first=local_to_utc_time(NIGHT_START, 0),
     )
 
