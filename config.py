@@ -1,12 +1,13 @@
-# ─────────────────────────────────────────────
-# CONFIGURATION — fill these in before running
-# ─────────────────────────────────────────────
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # Load environment variables from .env file
 
 # Your bot token from @BotFather
-BOT_TOKEN = "8729414710:AAHATLERQwOiUEHu9JHT5_vfc8Wjkvg72YU"
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # The chat_id of your Telegram group (negative number, e.g. -1001234567890)
-GROUP_ID = -1003928871705
+GROUP_ID = int(os.getenv("GROUP_ID"))
 
 # Map each floor name → its topic's message_thread_id
 # To find a thread ID: send a message in the topic, right-click → Copy Link
@@ -37,4 +38,4 @@ FLOOR_TOPICS = {
 
 # Your local timezone offset from UTC, in hours
 # Malaysia (MYT) = UTC+8, so set this to 8
-LOCAL_UTC_OFFSET = 8
+LOCAL_UTC_OFFSET = int(os.getenv("LOCAL_UTC_OFFSET"))

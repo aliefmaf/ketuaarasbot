@@ -1,7 +1,7 @@
 import json
 import os
 
-DATA_FILE = "data.json"
+DATA_FILE = "data/data.json"
 
 
 def load_data() -> dict:

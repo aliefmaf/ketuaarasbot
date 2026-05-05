@@ -13,10 +13,12 @@ from telegram.ext import (
 from config import BOT_TOKEN, GROUP_ID, FLOOR_TOPICS, LOCAL_UTC_OFFSET
 from storage import load_data, save_submission
 
+
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
+
 
 # Conversation states
 NAME, FLOOR, PHOTO, RATING, NOTES = range(5)
@@ -269,7 +271,7 @@ def main():
 
     jq = app.job_queue
 
-    # Morning reminders: first fires at 12:00pm local, then every 30 min
+    # Morning reminders: first fires at 12:00pm local, then every 1 hour
     # The window guard inside remind_morning stops it after 6pm
     jq.run_repeating(
         remind_morning,
@@ -281,7 +283,7 @@ def main():
     # The window guard inside remind_night stops it after 1am
     jq.run_repeating(
         remind_night,
-        interval=3600,
+        interval=1800,
         first=local_to_utc_time(NIGHT_START, 0),
     )
 

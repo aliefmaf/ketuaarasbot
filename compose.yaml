@@ -1,0 +1,8 @@
+services:
+  ketuaarasbot:
+    image: aliefmaf/ketuaarasbot
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
