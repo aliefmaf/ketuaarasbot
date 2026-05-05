@@ -83,7 +83,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if context.user_data["name"] and context.user_data["floor"]:
         await update.message.reply_text(
-            f"👋 Welcome back! *{context.user_data['name'] or 'N/A'}\n*Filing: *{shift_label}*"
+            f"👋 Welcome back, *{context.user_data['name'] or 'N/A'}*! Filing: *{shift_label}*"
             f"\nFloor: *{context.user_data['floor'] or 'N/A'}*.\n\n",
             parse_mode="Markdown"
         )
