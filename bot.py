@@ -57,7 +57,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = load_data()
 
     if user_id not in data["users"]:
-        data["users"][user_id] = {"name": None, "submissions": {}}
+        data["users"][user_id] = {"name": None, "floor": None, "submissions": {}}
         save_submission(data)
 
     shift = current_shift()
@@ -76,6 +76,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else "📋 Report"
     )
     context.user_data["shift"] = shift or "manual"
+
+    # load name and floor first
+    context.user_data["name"] = data["users"][user_id].get("name")
+    context.user_data["floor"] = data["users"][user_id].get("floor")
+
+    if context.user_data["name"] and context.user_data["floor"]:
+        await update.message.reply_text(
+            f"👋 Welcome back! *{context.user_data['name'] or 'N/A'}\n*Filing: *{shift_label}*"
+            f"\nFloor: *{context.user_data['floor'] or 'N/A'}*.\n\n",
+            parse_mode="Markdown"
+        )
+        await update.message.reply_text("📸 Please send a *photo* of the corridor.", parse_mode="Markdown")
+        return PHOTO
 
     await update.message.reply_text(
         f"👋 Welcome! Filing: *{shift_label}*\n\nWhat is your *name*?",
@@ -177,6 +190,7 @@ async def finalize_report(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = str(update.effective_user.id)
     today = date.today().isoformat()
     data["users"][user_id]["name"] = ud["name"]
+    data["users"][user_id]["floor"] = ud["floor"]
     data["users"][user_id].setdefault("submissions", {}).setdefault(today, {})[shift] = True
     save_submission(data)
 
