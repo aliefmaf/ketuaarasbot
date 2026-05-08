@@ -38,4 +38,4 @@ FLOOR_TOPICS = {
 
 # Your local timezone offset from UTC, in hours
 # Malaysia (MYT) = UTC+8, so set this to 8
-LOCAL_UTC_OFFSET = int(os.getenv("LOCAL_UTC_OFFSET"))
+LOCAL_UTC_OFFSET = int(os.getenv("LOCAL_UTC_OFFSET", "8"))

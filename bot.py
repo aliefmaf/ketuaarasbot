@@ -35,18 +35,25 @@ LOCAL_TZ = timezone(timedelta(hours=LOCAL_UTC_OFFSET))
 def local_now() -> datetime:
     return datetime.now(tz=LOCAL_TZ)
 
-
-def current_shift() -> str | None:
-    """Return 'morning' or 'night' based on local time, or None if between shifts."""
+def current_shift() -> str:
     hour = local_now().hour
     if 6 <= hour < 18:
         return "morning"
-    if hour >= 18:
-        return "night"
+    return "night"
 
+def today_local() -> str:
+    """Normal local date for checking submissions."""
+    return local_now().date().isoformat()
+
+def submission_date() -> str:
+    """For recording — treats post-midnight as previous day during night window."""
+    now = local_now()
+    if now.hour < NIGHT_END_H:
+        return (now - timedelta(days=1)).date().isoformat()
+    return now.date().isoformat()
 
 def has_submitted_shift(user_info: dict, shift: str) -> bool:
-    today = date.today().isoformat()
+    today = today_local()
     return user_info.get("submissions", {}).get(today, {}).get(shift, False)
 
 
@@ -75,7 +82,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else "🌙 Night shift" if shift == "night"
         else "📋 Report"
     )
-    context.user_data["shift"] = shift or "manual"
+    context.user_data["shift"] = shift
 
     # load name and floor first
     context.user_data["name"] = data["users"][user_id].get("name")
@@ -173,7 +180,7 @@ async def finalize_report(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"📋 *Floor Report — {floor}*\n\n"
         f"{shift_emoji} Shift: {shift.capitalize()}\n"
         f"👤 Rep: {ud['name']}\n"
-        f"📅 Date: {date.today().strftime('%d %B %Y')}\n"
+        f"📅 Date: {local_now().strftime('%d %B %Y')}\n"
         f"🏆 Corridor Rating: {stars} ({ud['rating']}/5)\n"
         f"📝 Notes: {ud['notes']}"
     )
@@ -188,7 +195,7 @@ async def finalize_report(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     data = load_data()
     user_id = str(update.effective_user.id)
-    today = date.today().isoformat()
+    today = submission_date()
     data["users"][user_id]["name"] = ud["name"]
     data["users"][user_id]["floor"] = ud["floor"]
     data["users"][user_id].setdefault("submissions", {}).setdefault(today, {})[shift] = True
@@ -210,7 +217,6 @@ async def remind_morning(context: ContextTypes.DEFAULT_TYPE):
     if not (MORNING_START <= hour < MORNING_END):
         return
 
-    today = date.today().isoformat()
     data = load_data()
 
     for user_id, info in data["users"].items():
@@ -235,7 +241,6 @@ async def remind_night(context: ContextTypes.DEFAULT_TYPE):
     if not (hour >= NIGHT_START or hour < NIGHT_END_H):
         return
 
-    today = date.today().isoformat()
     data = load_data()
 
     for user_id, info in data["users"].items():
@@ -293,11 +298,11 @@ def main():
         first=local_to_utc_time(MORNING_START, 0),
     )
 
-    # Night reminders: first fires at 10:00pm local, then every 30 min
+    # Night reminders: first fires at 10:00pm local, then every 1 hour
     # The window guard inside remind_night stops it after 1am
     jq.run_repeating(
         remind_night,
-        interval=1800,
+        interval=3600,  # 1 hour
         first=local_to_utc_time(NIGHT_START, 0),
     )
 
