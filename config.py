@@ -12,6 +12,9 @@ GROUP_ID = int(os.getenv("GROUP_ID"))
 # Map each floor name → its topic's message_thread_id
 # To find a thread ID: send a message in the topic, right-click → Copy Link
 # The number after the last `/` is the thread ID
+# Example: https://t.me/c/1234567890/42 → thread ID is 42
+
+# These are example values; replace them with your actual topic names and thread IDs
 FLOOR_TOPICS = {
     "A100": 3,
     "A200": 5,
