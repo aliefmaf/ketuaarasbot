@@ -28,7 +28,7 @@ A Telegram bot for block heads to manage floor inspection reports from floor rep
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/yourusername/ketuaarasbot.git
+git clone https://github.com/aliefmaf/ketuaarasbot.git
 cd ketuaarasbot
 ```
 
